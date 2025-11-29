@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0FluffCook V2.1</title>
+    <title>0FluffCook V2.2</title>
     <style>
         :root {
             --bg: #000000;
@@ -11,7 +11,6 @@
             --text: #ececec;
             --accent: #ff6b6b;
             --dim: #888;
-            --success: #4caf50;
         }
         body {
             background-color: var(--bg);
@@ -26,11 +25,8 @@
         }
         h1 { margin-bottom: 5px; letter-spacing: -1px; }
         .subtitle { color: var(--dim); font-size: 0.9rem; margin-bottom: 20px; }
-        
-        /* Layout */
         .container { width: 100%; max-width: 600px; padding-bottom: 80px; }
         
-        /* Inputs & Buttons */
         input, textarea, button {
             width: 100%;
             padding: 15px;
@@ -53,13 +49,9 @@
         }
         button:active { transform: scale(0.98); }
         button.secondary { background: #333; }
-        button.outline { background: transparent; border: 1px solid #333; color: var(--dim); }
         button.icon-btn { width: auto; padding: 8px 12px; margin: 0; }
-
-        /* Action Row */
         .action-row { display: flex; gap: 10px; margin-bottom: 10px; }
         
-        /* Recipe Cards */
         .recipe-list { display: grid; gap: 15px; width: 100%; margin-top: 20px; }
         .recipe-card {
             background: var(--card);
@@ -75,7 +67,6 @@
         .fav-icon { position: absolute; top: 20px; right: 20px; color: var(--dim); }
         .favorite .fav-icon { color: var(--accent); }
 
-        /* Modals */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9);
@@ -97,12 +88,8 @@
         }
         .ingredient-item { border-bottom: 1px solid #333; padding: 10px 0; }
         .step-item { margin-bottom: 15px; line-height: 1.5; }
-        
-        /* Settings */
         #settings-panel { display: none; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .hidden { display: none; }
-        
-        /* Modal Actions */
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
     </style>
 </head>
@@ -112,7 +99,7 @@
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
             <h1>0FluffCook</h1>
-            <div class="subtitle">V2.1 | Now with Real Scraper</div>
+            <div class="subtitle">V2.2 | Multi-Proxy Scraper</div>
         </div>
         <button onclick="toggleSettings()" class="icon-btn" style="font-size:1.5rem; background:none;">⚙️</button>
     </div>
@@ -121,8 +108,8 @@
         <p style="font-size:0.8rem; color:var(--dim);">API Key (Gemini):</p>
         <input type="password" id="apiKeyInput" placeholder="sk-..." onchange="saveKey()">
         <div class="action-row">
-            <button class="secondary" onclick="exportData()">💾 Backup (Export JSON)</button>
-            <button class="secondary" onclick="document.getElementById('importFile').click()">📂 Restore (Import JSON)</button>
+            <button class="secondary" onclick="exportData()">💾 Backup</button>
+            <button class="secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
             <input type="file" id="importFile" style="display:none" onchange="importData(this)">
         </div>
     </div>
@@ -135,7 +122,6 @@
     </div>
     
     <div id="loading" class="hidden" style="text-align:center; color:var(--dim); margin:10px;">Chef is cooking...</div>
-
     <div class="recipe-list" id="recipeList"></div>
 </div>
 
@@ -145,13 +131,11 @@
             <h2 id="modalTitle" style="margin-top:0;">Title</h2>
             <button onclick="closeModal('recipeModal')" class="icon-btn" style="background:none; font-size:1.5rem;">✕</button>
         </div>
-
         <div class="action-row" style="margin-bottom: 20px;">
             <button class="secondary icon-btn" onclick="toggleFavoriteCurrent()">❤️</button>
             <button class="secondary icon-btn" onclick="copyToClipboard()">📋 Copy</button>
             <button class="secondary icon-btn" onclick="editCurrentRecipe()">✏️ Edit</button>
         </div>
-
         <div style="margin: 20px 0;">
             <h3 style="color:var(--accent)">Ingredients</h3>
             <div id="modalIngredients"></div>
@@ -160,7 +144,6 @@
             <h3 style="color:var(--accent)">Instructions</h3>
             <div id="modalSteps"></div>
         </div>
-
         <div class="modal-actions">
             <button class="secondary" style="background: #3a1c1c; color: #ff6b6b;" onclick="deleteCurrentRecipe()">Delete Recipe</button>
         </div>
@@ -171,13 +154,10 @@
     <div class="modal-content">
         <h2>Recipe Editor</h2>
         <input type="text" id="editTitle" placeholder="Recipe Title">
-        
         <p style="font-size:0.8rem; color:var(--dim); margin-bottom:5px;">Ingredients (One per line)</p>
         <textarea id="editIngredients" rows="6"></textarea>
-        
         <p style="font-size:0.8rem; color:var(--dim); margin-bottom:5px;">Steps (One per line)</p>
         <textarea id="editSteps" rows="6"></textarea>
-        
         <div class="action-row">
             <button onclick="saveEditor()">💾 Save Recipe</button>
             <button class="secondary" onclick="closeModal('editorModal')">Cancel</button>
@@ -186,17 +166,14 @@
 </div>
 
 <script>
-    // --- STATE ---
     let recipes = JSON.parse(localStorage.getItem('gourmet_recipes') || '[]');
     let apiKey = localStorage.getItem('gourmet_key') || '';
     let currentRecipeId = null;
     let isEditingId = null;
 
-    // --- INIT ---
     if(apiKey) document.getElementById('apiKeyInput').value = apiKey;
     render();
 
-    // --- CORE FUNCTIONS ---
     function toggleSettings() {
         const panel = document.getElementById('settings-panel');
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
@@ -206,6 +183,28 @@
         apiKey = document.getElementById('apiKeyInput').value;
         localStorage.setItem('gourmet_key', apiKey);
         toggleSettings();
+    }
+
+    // --- SMART PROXY FETCH ---
+    async function fetchHTML(targetUrl) {
+        // Try Proxy 1: Corsproxy.io (Fastest)
+        try {
+            console.log("Trying Proxy 1...");
+            const p1 = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+            const res = await fetch(p1);
+            if(res.ok) return await res.text();
+        } catch(e) { console.warn("Proxy 1 failed"); }
+
+        // Try Proxy 2: AllOrigins (Fallback)
+        try {
+            console.log("Trying Proxy 2...");
+            const p2 = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+            const res = await fetch(p2);
+            const data = await res.json();
+            if(data.contents) return data.contents;
+        } catch(e) { console.warn("Proxy 2 failed"); }
+
+        return null; // Both failed
     }
 
     async function cook() {
@@ -218,33 +217,24 @@
         loadingEl.innerText = "Chef is cooking...";
 
         try {
-            // STEP 1: PROXY SCRAPING
-            // If it's a URL, we must fetch the HTML first using a proxy to bypass CORS
+            // STEP 1: SCRAPE (If URL)
             if (input.startsWith('http')) {
-                loadingEl.innerText = "Fetching website content...";
-                try {
-                    // Using allorigins.win as a free CORS proxy
-                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(input)}`;
-                    const fetchRes = await fetch(proxyUrl);
-                    const fetchData = await fetchRes.json();
-                    
-                    if (fetchData.contents) {
-                        // We attach the actual HTML to the input, but limit it to 40,000 chars 
-                        // to save tokens while keeping the core content.
-                        input = "SOURCE HTML CONTENT: " + fetchData.contents.substring(0, 40000);
-                    } else {
-                        throw new Error("Empty response from proxy");
-                    }
-                } catch (err) {
-                    console.warn("Proxy failed", err);
-                    alert("Could not download site directly. AI will try to guess based on URL (less accurate).");
+                loadingEl.innerText = "Attempting to scrape website...";
+                const htmlContent = await fetchHTML(input);
+                
+                if (htmlContent) {
+                    // Success! Attach HTML (limited length)
+                    input = "SOURCE HTML: " + htmlContent.substring(0, 50000);
+                } else {
+                    // Fail!
+                    alert("Security Block: This website blocked our scrapers. AI will try its best, but accuracy isn't guaranteed.");
+                    // We let it proceed with just the URL, but warned the user.
                 }
             }
 
-            // STEP 2: AI PROCESSING
-            loadingEl.innerText = "AI is extracting recipe...";
+            // STEP 2: AI
+            loadingEl.innerText = "AI is extracting...";
             
-            // STRICT PROMPT to prevent hallucination
             const prompt = `You are a strict recipe data extractor. 
             Analyze the following text or HTML.
             If the text contains a recipe, extract it into this JSON format: { "title": "String", "ingredients": ["String"], "steps": ["String"] }.
@@ -263,10 +253,7 @@
             });
 
             const data = await response.json();
-            
-            if (!data.candidates || !data.candidates[0].content) {
-                throw new Error("AI returned no data.");
-            }
+            if (!data.candidates || !data.candidates[0].content) throw new Error("AI returned no data.");
 
             const rawText = data.candidates[0].content.parts[0].text;
             const jsonStr = rawText.replace(/```json/g, '').replace(/```/g, '');
@@ -291,32 +278,19 @@
         }
     }
 
-    // --- RENDER ---
     function render() {
         const list = document.getElementById('recipeList');
         list.innerHTML = '';
-        
-        const sortedRecipes = [...recipes].sort((a, b) => {
-            if (a.isFavorite === b.isFavorite) return b.id - a.id;
-            return a.isFavorite ? -1 : 1;
-        });
-
-        sortedRecipes.forEach(r => {
+        const sorted = [...recipes].sort((a, b) => (a.isFavorite === b.isFavorite) ? b.id - a.id : (a.isFavorite ? -1 : 1));
+        sorted.forEach(r => {
             const card = document.createElement('div');
             card.className = `recipe-card ${r.isFavorite ? 'favorite' : ''}`;
-            card.innerHTML = `
-                <div class="fav-icon">${r.isFavorite ? '❤️' : '♡'}</div>
-                <div class="recipe-title">${r.title}</div>
-                <div class="tags">
-                    <span>${r.ingredients.length} ingredients</span>
-                </div>
-            `;
-            card.onclick = (e) => openModal(r);
+            card.innerHTML = `<div class="fav-icon">${r.isFavorite ? '❤️' : '♡'}</div><div class="recipe-title">${r.title}</div><div class="tags"><span>${r.ingredients.length} ingredients</span></div>`;
+            card.onclick = () => openModal(r);
             list.appendChild(card);
         });
     }
 
-    // --- MODAL & ACTIONS ---
     function openModal(r) {
         currentRecipeId = r.id;
         document.getElementById('modalTitle').innerText = r.title;
@@ -324,42 +298,23 @@
         document.getElementById('modalSteps').innerHTML = r.steps.map((s, i) => `<div class="step-item"><b>${i+1}.</b> ${s}</div>`).join('');
         document.getElementById('recipeModal').classList.add('active');
     }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('active');
-    }
-
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     function toggleFavoriteCurrent() {
-        const r = recipes.find(item => item.id === currentRecipeId);
-        if(r) {
-            r.isFavorite = !r.isFavorite;
-            saveRecipes();
-            render();
-            closeModal('recipeModal');
-        }
+        const r = recipes.find(i => i.id === currentRecipeId);
+        if(r) { r.isFavorite = !r.isFavorite; saveRecipes(); render(); closeModal('recipeModal'); }
     }
-
     function deleteCurrentRecipe() {
-        if(confirm("Trash this permanently?")) {
-            recipes = recipes.filter(r => r.id !== currentRecipeId);
-            saveRecipes();
-            render();
-            closeModal('recipeModal');
-        }
+        if(confirm("Delete?")) { recipes = recipes.filter(r => r.id !== currentRecipeId); saveRecipes(); render(); closeModal('recipeModal'); }
     }
-
     function copyToClipboard() {
-        const r = recipes.find(item => item.id === currentRecipeId);
+        const r = recipes.find(i => i.id === currentRecipeId);
         if(!r) return;
-        const text = `${r.title}\n\nINGREDIENTS:\n${r.ingredients.join('\n')}\n\nSTEPS:\n${r.steps.join('\n')}`;
-        navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+        navigator.clipboard.writeText(`${r.title}\n\n${r.ingredients.join('\n')}\n\n${r.steps.join('\n')}`).then(() => alert("Copied!"));
     }
-
-    // --- MANUAL EDITOR ---
     function openEditor() {
-        const viewModalOpen = document.getElementById('recipeModal').classList.contains('active');
-        if (viewModalOpen && currentRecipeId) {
-            const r = recipes.find(item => item.id === currentRecipeId);
+        const viewOpen = document.getElementById('recipeModal').classList.contains('active');
+        if (viewOpen && currentRecipeId) {
+            const r = recipes.find(i => i.id === currentRecipeId);
             isEditingId = currentRecipeId;
             document.getElementById('editTitle').value = r.title;
             document.getElementById('editIngredients').value = r.ingredients.join('\n');
@@ -373,78 +328,37 @@
         }
         document.getElementById('editorModal').classList.add('active');
     }
-    
     function editCurrentRecipe() { openEditor(); }
-
     function saveEditor() {
         const title = document.getElementById('editTitle').value;
-        const ingRaw = document.getElementById('editIngredients').value;
-        const stepsRaw = document.getElementById('editSteps').value;
+        const ingRaw = document.getElementById('editIngredients').value.split('\n').filter(l => l.trim()!=='');
+        const stepsRaw = document.getElementById('editSteps').value.split('\n').filter(l => l.trim()!=='');
+        if(!title) return alert("Title required");
         
-        if(!title) return alert("Title is required");
-
-        const newIngredients = ingRaw.split('\n').filter(line => line.trim() !== '');
-        const newSteps = stepsRaw.split('\n').filter(line => line.trim() !== '');
-
         if(isEditingId) {
-            const index = recipes.findIndex(r => r.id === isEditingId);
-            if(index !== -1) {
-                recipes[index].title = title;
-                recipes[index].ingredients = newIngredients;
-                recipes[index].steps = newSteps;
-            }
+            const idx = recipes.findIndex(r => r.id === isEditingId);
+            if(idx !== -1) { recipes[idx].title=title; recipes[idx].ingredients=ingRaw; recipes[idx].steps=stepsRaw; }
         } else {
-            const newRecipe = {
-                id: Date.now(),
-                title: title,
-                ingredients: newIngredients,
-                steps: newSteps,
-                isFavorite: false
-            };
-            recipes.unshift(newRecipe);
+            recipes.unshift({ id: Date.now(), title, ingredients: ingRaw, steps: stepsRaw, isFavorite: false });
         }
-        saveRecipes();
-        render();
-        closeModal('editorModal');
+        saveRecipes(); render(); closeModal('editorModal');
     }
-
-    // --- IMPORT / EXPORT ---
     function exportData() {
-        const dataStr = JSON.stringify(recipes, null, 2);
-        const blob = new Blob([dataStr], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `0FluffCook_Backup_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+        const url = URL.createObjectURL(new Blob([JSON.stringify(recipes, null, 2)], {type: "application/json"}));
+        const a = document.createElement('a'); a.href=url; a.download=`0Fluff_Backup.json`; a.click();
     }
-
     function importData(input) {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
+        const f = input.files[0]; if(!f) return;
+        const r = new FileReader();
+        r.onload = e => {
             try {
-                const imported = JSON.parse(e.target.result);
-                if(Array.isArray(imported)) {
-                    if(confirm(`Found ${imported.length} recipes. Overwrite current list?`)) {
-                        recipes = imported;
-                    } else {
-                        const currentIds = new Set(recipes.map(r => r.id));
-                        imported.forEach(r => { if(!currentIds.has(r.id)) recipes.push(r); });
-                    }
-                    saveRecipes();
-                    render();
-                    alert("Import successful!");
-                } else { alert("Invalid file format."); }
-            } catch(err) { alert("Error reading file."); }
+                const d = JSON.parse(e.target.result);
+                if(confirm(`Import ${d.length} recipes?`)) { recipes=d; saveRecipes(); render(); alert("Done!"); }
+            } catch(err) { alert("Bad file"); }
         };
-        reader.readAsText(file);
+        r.readAsText(f);
     }
-
     function saveRecipes() { localStorage.setItem('gourmet_recipes', JSON.stringify(recipes)); }
 </script>
-
 </body>
 </html>
