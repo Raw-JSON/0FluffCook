@@ -1,4 +1,4 @@
-// 0FluffCook V3.1 Logic
+// 0FluffCook V3.1 Final Logic
 
 // --- STATE MANAGEMENT ---
 let recipes = JSON.parse(localStorage.getItem('gourmet_recipes') || '[]');
@@ -26,24 +26,22 @@ function saveKey() {
 
 // --- SCRAPING ENGINE (MULTI-PROXY) ---
 async function fetchHTML(targetUrl) {
-    // Strategy 1: Corsproxy.io (Fastest, High Success)
+    // Strategy 1: Corsproxy.io (Fastest)
     try {
-        console.log("Attempting Proxy 1 (Corsproxy)...");
         const p1 = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
         const res = await fetch(p1);
         if(res.ok) return await res.text();
     } catch(e) { console.warn("Proxy 1 failed"); }
 
-    // Strategy 2: AllOrigins (Fallback, JSON based)
+    // Strategy 2: AllOrigins (Fallback)
     try {
-        console.log("Attempting Proxy 2 (AllOrigins)...");
         const p2 = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
         const res = await fetch(p2);
         const data = await res.json();
         if(data.contents) return data.contents;
     } catch(e) { console.warn("Proxy 2 failed"); }
 
-    return null; // All strategies failed
+    return null; // Both failed
 }
 
 // --- MAIN LOGIC (COOK) ---
@@ -67,7 +65,7 @@ async function cook() {
             const htmlContent = await fetchHTML(input);
             
             if (htmlContent) {
-                // Limit to ~50k chars to preserve tokens while keeping core content
+                // Limit to ~50k chars
                 input = "SOURCE HTML: " + htmlContent.substring(0, 50000);
             } else {
                 alert("Security Warning: This site blocked our scrapers. AI will attempt to extract based on the URL alone (accuracy may vary).");
@@ -82,10 +80,7 @@ async function cook() {
         
         STRICT RULES:
         1. TRUTH: Use ONLY the provided text. Do not invent ingredients.
-        2. FORMATTING: Clean up the output. 
-           - REMOVE repetitive prefixes (e.g., convert "For the Sauce: 1 cup sugar" to "1 cup sugar (Sauce)").
-           - Simplify repeated ingredient sections.
-           - Ensure professional formatting.
+        2. FORMATTING: Clean up the output. Remove repetitive prefixes and simplify where necessary.
         3. JSON ONLY. No markdown, no conversation.
         
         TEXT TO ANALYZE: ${input}`;
@@ -98,7 +93,6 @@ async function cook() {
 
         const data = await response.json();
         
-        // Error Handling for AI response
         if (!data.candidates || !data.candidates[0].content) {
             throw new Error("AI returned an empty response. Check API Key or Quota.");
         }
@@ -113,15 +107,14 @@ async function cook() {
             throw new Error("Failed to parse recipe JSON. AI output was malformed.");
         }
         
-        // --- V3.1 VALIDATION CHECK ---
+        // --- V3.1 FINAL VALIDATION CHECK ---
         if(recipeData.error) {
-            // Case 1: AI explicitly returned an error JSON
             alert("AI Error: " + recipeData.error);
             return;
         } else if (recipeData.ingredients.length === 0 && recipeData.steps.length === 0) {
-            // Case 2: AI returned a structure but it's empty (the bug you found)
+            // THE FIX: Abort save if the output is empty
             alert("Extraction Failed: AI couldn't locate any ingredients or steps in that text.");
-            return; // ABORT SAVE
+            return; 
         } 
         // --- END V3.1 VALIDATION ---
         
@@ -163,7 +156,6 @@ function render() {
             </div>
         `;
         card.onclick = (e) => {
-            // Prevent triggering modal if clicking fav icon specifically (optional polish)
             openModal(r);
         };
         list.appendChild(card);
@@ -189,7 +181,6 @@ function toggleFavoriteCurrent() {
         r.isFavorite = !r.isFavorite;
         saveRecipes();
         render();
-        // Optional: Keep modal open and update icon state, or close. Closing is simpler for V3.
         closeModal('recipeModal');
     }
 }
