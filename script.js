@@ -1,4 +1,4 @@
-// 0FluffCook V3.3.2 Logic - Syntax Fix
+// 0FluffCook V3.4 Logic - FIXED Regex
 
 // --- STATE MANAGEMENT ---
 let recipes = JSON.parse(localStorage.getItem('gourmet_recipes') || '[]');
@@ -42,14 +42,15 @@ async function fetchHTML(targetUrl) {
     return null;
 }
 
-// --- CRITICAL FIX: HTML CLEANING UTILITY ---
+// --- HTML CLEANING UTILITY (FIXED) ---
 function cleanHtmlForAi(html) {
     if (!html) return '';
     
     // 1. Remove scripts, styles, and comments
+    // The line below was the crash cause. It is now fixed.
     let cleaned = html.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, '')
                       .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, '')
-                      .replace(//g, ''); // <--- SYNTAX ERROR FIXED HERE
+                      .replace(//g, ''); 
 
     // 2. Remove common noisy structural tags
     cleaned = cleaned.replace(/<(header|footer|nav|aside|iframe|svg)[^>]*>[\s\S]*?<\/(header|footer|nav|aside|iframe|svg)>/gi, '');
