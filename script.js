@@ -1,4 +1,4 @@
-// 0FluffCook V3.1 Stable Logic (Pre-HTML Cleaner)
+// 0FluffCook V3.5 Final Logic - DOMParser Fix
 
 // --- STATE MANAGEMENT ---
 let recipes = JSON.parse(localStorage.getItem('gourmet_recipes') || '[]');
@@ -44,6 +44,36 @@ async function fetchHTML(targetUrl) {
     return null; // Both failed
 }
 
+// --- NEW FIX: DOMParser HTML CLEANING UTILITY (Surgical Clean) ---
+function cleanHtmlForAi(html) {
+    if (!html) return '';
+    
+    // 1. Create a temporary, safe DOM document
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // 2. Define high-noise selectors to remove (Surgical removal)
+    const selectorsToRemove = [
+        'script', 'style', 'noscript', 'iframe', 'svg', 'img', // Core noise
+        'header', 'footer', 'nav', 'aside', // Structural noise
+        '[data-nosnippet]', '.ad', '#comments', '[class*="ad-"]' // Common ad/tracking/comment noise
+    ];
+
+    selectorsToRemove.forEach(selector => {
+        doc.querySelectorAll(selector).forEach(element => {
+            element.remove();
+        });
+    });
+
+    // 3. Get the cleaned content back (use innerText for massive token reduction)
+    let cleanedText = doc.body.innerText || doc.documentElement.innerText;
+    
+    // 4. Clean up whitespace and unnecessary lines
+    cleanedText = cleanedText.replace(/\s\s+/g, ' ').trim();
+    
+    return cleanedText;
+}
+
 // --- MAIN LOGIC (COOK) ---
 async function cook() {
     let input = document.getElementById('rawInput').value.trim();
@@ -65,8 +95,9 @@ async function cook() {
             const htmlContent = await fetchHTML(input);
             
             if (htmlContent) {
-                // OLD V3.1 LOGIC: Sends raw HTML (can still fail on noisy sites)
-                input = "SOURCE HTML: " + htmlContent.substring(0, 50000);
+                // APPLY NEW FIX: Surgical Cleaning
+                const cleanedText = cleanHtmlForAi(htmlContent);
+                input = "SOURCE TEXT: " + cleanedText.substring(0, 50000);
             } else {
                 alert("Security Warning: This site blocked our scrapers. AI will attempt to extract based on the URL alone (accuracy may vary).");
             }
@@ -107,18 +138,16 @@ async function cook() {
             throw new Error("Failed to parse recipe JSON. AI output was malformed.");
         }
         
-        // --- V3.1 FINAL VALIDATION CHECK ---
+        // --- VALIDATION CHECK ---
         if(recipeData.error) {
             alert("AI Error: " + recipeData.error);
             return;
         } else if (recipeData.ingredients.length === 0 && recipeData.steps.length === 0) {
-            // Fails on noisy sites
             alert("Extraction Failed: AI couldn't locate any ingredients or steps in that text.");
             return; 
         } 
-        // --- END V3.1 VALIDATION ---
         
-        // Success Path (only runs if data is valid and non-empty)
+        // Success Path 
         recipeData.id = Date.now();
         recipeData.isFavorite = false;
         recipes.unshift(recipeData);
