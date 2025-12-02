@@ -25,6 +25,9 @@
     <div id="settings-panel">
         <p style="font-size:0.8rem; color:var(--dim); margin-bottom: 5px;">API Key (Gemini):</p>
         <input type="password" id="apiKeyInput" placeholder="sk-..." onchange="saveKey()">
+
+        <p style="font-size:0.8rem; color:var(--dim); margin-bottom: 5px; margin-top: 15px;">Custom AI Rules (One rule per line, e.g., 'Do not use cilantro')</p>
+        <textarea id="customRulesInput" rows="3" placeholder="No spicy food, must be low-fat, total time under 30 minutes..." onchange="saveRules()"></textarea>
         
         <div class="action-row">
             <button class="secondary" onclick="exportData()">💾 Backup</button>
@@ -39,10 +42,14 @@
         </button>
     </div>
 
-    <textarea id="rawInput" rows="2" placeholder="Paste URL, messy text, or ingredients..."></textarea>
+    <textarea id="rawInput" rows="2" placeholder="Paste URL, messy text, ingredients (for extraction) or describe a recipe (for generation)..."></textarea>
     
     <div class="action-row">
         <button onclick="cook()">🔥 Extract with AI</button>
+    </div>
+
+    <div class="action-row">
+        <button onclick="generateRecipe()" style="background: var(--beta); color: var(--bg); font-weight: 800;">✨ Generate Recipe</button>
         <button class="secondary" onclick="openEditor()" style="width: 40%;">+ Manual</button>
     </div>
     
