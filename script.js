@@ -178,7 +178,6 @@ async function cook() {
     }
 }
 
-
 // --- NEW LOGIC (CHEF MODE - GENERATION) ---
 async function generateRecipe() {
     const input = document.getElementById('rawInput').value.trim();
@@ -414,4 +413,4 @@ window.saveEditor = saveEditor;
 window.closeModal = closeModal;
 window.toggleFavoriteCurrent = toggleFavoriteCurrent;
 window.deleteCurrentRecipe = deleteCurrentRecipe;
-window.copyToClipboard = copyToClipboard;
+window.copyToClipboard = copyToClipboard
