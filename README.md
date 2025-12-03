@@ -36,11 +36,6 @@ This release stabilizes the new mobile gesture controls and improves component v
 * Core integration of the Share Function for easy export.
 
 ---
-
-## 🤖 Transparency Note
-
-The project's overall **Architecture, Design, and Direction** are credited to **me**. The code for this application was executed and written by the **Gemini 2.5 Flash AI model** under the strict supervision and instruction by me.
-
 ---
 
 ## 🔑 Setup (Bring Your Own Key)
