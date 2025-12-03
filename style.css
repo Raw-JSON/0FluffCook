@@ -193,7 +193,8 @@ button.github-btn {
     z-index: 5;
     opacity: 0; /* Hidden by default, controlled by JS opacity */
     transition: background-color 0.2s;
-    padding: 0 30px; /* Increased padding to give icons room */
+    /* FIX: Doubled padding to pull icon further in from the edges */
+    padding: 0 60px; 
 }
 
 /* SVG Icon Styling */
@@ -204,16 +205,14 @@ button.github-btn {
 
 .swipe-delete {
     background-color: var(--delete);
-    /* FIX: Center the icon instead of pushing it to the edge */
-    justify-content: center;
-    padding-right: 20px;
+    /* Revert to side anchoring, now with more padding */
+    justify-content: flex-end;
 }
 
 .swipe-favorite {
     background-color: var(--favorite-bg);
-    /* FIX: Center the icon instead of pushing it to the edge */
-    justify-content: center;
-    padding-left: 20px;
+    /* Revert to side anchoring, now with more padding */
+    justify-content: flex-start;
 }
 
 
