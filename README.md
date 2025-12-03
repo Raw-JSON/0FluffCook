@@ -39,7 +39,7 @@ This release stabilizes the new mobile gesture controls and improves component v
 
 ## 🤖 Transparency Note
 
-The project's overall **Architecture, Design, and Direction** are credited to **The Architect**. The code for this application was executed and written by the **Gemini 2.5 Flash AI model** under the strict supervision and instruction of The Architect.
+The project's overall **Architecture, Design, and Direction** are credited to **me**. The code for this application was executed and written by the **Gemini 2.5 Flash AI model** under the strict supervision and instruction by me.
 
 ---
 
