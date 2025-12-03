@@ -260,7 +260,7 @@ function render() {
     // SVG Icons (minimal, efficient, "0Fluff")
     const deleteIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.643a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.475-.386M12 21.75V4.688m0-3.75h-.008L9.288 3.51a.75.75 0 00-.736-.367H5.625a.75.75 0 00-.735.632L4.04 6.75m14.456 0a48.108 48.108 0 00-3.475-.386M12 21.75V4.688m0-3.75h-.008L9.288 3.51a.75.75 0 00-.736-.367H5.625a.75.75 0 00-.735.632L4.04 6.75M12 3.75h.008l2.712-.862a.75.75 0 00.736.367h3.637c.22 0 .415.134.485.346l1.042 3.125m-6.183-3.048c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.643a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.475-.386M12 21.75V4.688m0-3.75h.008l2.712-.862a.75.75 0 00.736.367h3.637c.22 0 .415.134.485.346l1.042 3.125" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.643a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.475-.386M12 21.75V4.688m0-3.75h-.008L9.288 3.51a.75.75 0 00-.736-.367H5.625a.75.75 0 00-.735.632L4.04 6.75m14.456 0a48.108 48.108 0 00-3.475-.386M12 21.75V4.688m0-3.75h-.008L9.288 3.51a.75.75 0 00-.736-.367H5.625a.75.75 0 00-.735.632L4.04 6.75M12 3.75h.008l2.712-.862a.75.75 0 00.736.367h3.637c.22 0 .415.134.485.346l1.042 3.125m-6.183-3.048c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.643a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.475-.386M12 21.75V4.688m0-3.75h-.008l2.712-.862a.75.75 0 00.736.367h3.637c.22 0 .415.134.485.346l1.042 3.125" />
         </svg>
     `;
     const favoriteIcon = `
@@ -360,22 +360,20 @@ function handleTouchEnd(e) {
     // --- Action Logic ---
     if (dx > SWIPE_THRESHOLD) {
         // Swipe Right: Favorite/Unfavorite
-        const updatedRecipe = toggleFavoriteById(recipeId);
-
-        // Visual feedback based on new state
-        if (updatedRecipe.isFavorite) {
-             cardContent.style.transform = 'translateX(100%)'; // Swipe out right
-        } else {
-             cardContent.style.transform = 'translateX(0)'; // Snap back if unfavorited
-        }
+        toggleFavoriteById(recipeId); // Perform the action
         
-        // Wait for the visual transition to complete, then re-render
+        // FIX: Removed manual transform which caused the flicker/jump. 
+        // We let the card snap back to 0, then immediately re-render.
+        cardContent.style.transform = 'translateX(0)'; 
+
+        // Wait 0ms to ensure the UI snaps back before we redraw the whole list
         setTimeout(() => {
             render();
-        }, 300);
+        }, 0); 
 
     } else if (dx < -SWIPE_THRESHOLD) {
         // Swipe Left: Delete
+        // The delete action still benefits from the slide out for visual drama
         deleteRecipeById(recipeId);
         cardContent.style.transform = 'translateX(-100%)'; // Swipe out left
         
