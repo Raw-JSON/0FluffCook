@@ -8,14 +8,10 @@ A lightweight, privacy-focused utility that **Extracts** recipes from messy text
 
 ---
 
-## ✅ V4.1.0 Major Release: UX Overhaul & Swiping
+## ✅ Core Features
 
-This release transforms the user experience from functional to fluid, focusing on speed and native mobile interaction.
-
-### 🚀 Core Features
-
+* **Mobile Gesture Support:** Recipes support **swipe-to-action** (Swipe Right to **Favorite**, Swipe Left for **Delete**), massively accelerating list management.
 * **UI/UX Refresh:** The entire application interface has been updated for a sleeker, darker, and more modern look (OLED Aesthetic).
-* **Mobile Gesture Support:** Recipes now support **swipe-to-action** (Swipe Right to **Favorite**, Swipe Left to **Delete**), massively accelerating list management.
 * **New Utility: Share Function:** Added native mobile sharing support to quickly export clean recipe text.
 * **Chef Mode (Generate):** Instantly create new recipes using natural language prompts and constraints.
 * **AI Smart Parse:** Uses Gemini 2.5 Flash to intelligently filter noise and structure text into clean JSON.
@@ -24,9 +20,26 @@ This release transforms the user experience from functional to fluid, focusing o
 
 ---
 
-## ⚠️ Known Issues
+## 📜 Changelog
 
-* **Swipe Icon Feedback:** The visual feedback for the swipe actions needs polishing. The **Delete** side currently shows a strong red background but the icon visibility is poor, and the **Favorite** icon on the swipe overlay appears off-center or styled incorrectly. This is scheduled for the next minor release.
+### 🚀 v4.1.1 Patch Release (Stabilization)
+
+This release stabilizes the new mobile gesture controls and improves component visibility.
+
+* **fix(ux): Smooth Swipe Transition:** Eliminated the visual jump that occurred after successfully **Favoriting** a recipe via swipe, ensuring the list re-renders smoothly.
+* **feat(ux): Minimalist Icons:** Switched to highly legible, zero-bloat emoji/text icons for swipe actions, backed by high-contrast framing for guaranteed visibility across all devices.
+* **fix(style): Alignment Refinement:** Adjusted internal padding and anchoring of swipe overlays to ensure indicators appear correctly centered during partial gestures.
+
+### ✨ v4.1.0 Major Release (UX Overhaul)
+
+* UI/UX Refresh and Mobile Gesture Support implemented.
+* New Share Function added.
+
+---
+
+## 🤖 Transparency Note
+
+The project's overall **Architecture, Design, and Direction** are credited to **The Architect**. The code for this application was executed and written by the **Gemini 2.5 Flash AI model** under the strict supervision and instruction of The Architect.
 
 ---
 
