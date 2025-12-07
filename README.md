@@ -10,16 +10,6 @@ Powered by Gemini, running entirely on your device.
 
 ---
 
-## 📸 Preview
-
-### Main Page
-![Main Page](https://github.com/user-attachments/assets/a277310d-3d54-4e33-bf6b-d0b4264c3aa9)
-
-### Recipe Card
-![Recipe Card](https://github.com/user-attachments/assets/9902c2e9-5c2f-4ef0-8845-e6a80e433731)
-
----
-
 ## 🚀 Core Features
 
 - **Swipe Gestures (Mobile Beast Mode)**  
