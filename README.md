@@ -1,9 +1,9 @@
 # 0FluffCook 🔪🔥
 
-**No ads. No life stories. No influencer monologues.  
+> **No ads. No life stories. No influencer monologues.  
 Just recipes — extracted or generated instantly.**
 
-A clean, fast, privacy-first cooking utility that **parses messy recipes** or **creates new ones** on command.  
+> A clean, fast, privacy-first cooking utility that **parses messy recipes** or **creates new ones** on command.  
 Powered by Gemini, running entirely on your device.
 
 **[🔗 Open 0FluffCook](https://raw-json.github.io/0FluffCook/)**
